@@ -38,6 +38,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * {@code HttpMessageWriter} that wraps and delegates to an {@link Encoder}.
@@ -50,6 +51,7 @@ import org.springframework.util.Assert;
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
  * @author Brian Clozel
+ * @author Sam Brannen
  * @since 5.0
  * @param <T> the type of objects in the input stream
  */
@@ -118,7 +120,8 @@ public class EncoderHttpMessageWriter<T> implements HttpMessageWriter<T> {
 
 		if (inputStream instanceof Mono) {
 			HttpHeaders headers = message.getHeaders();
-			return Mono.from(body)
+			return body
+					.singleOrEmpty()
 					.switchIfEmpty(Mono.defer(() -> {
 						headers.setContentLength(0);
 						return message.setComplete().then(Mono.empty());
@@ -165,17 +168,27 @@ public class EncoderHttpMessageWriter<T> implements HttpMessageWriter<T> {
 		return main;
 	}
 
-	private boolean isStreamingMediaType(@Nullable MediaType contentType) {
-		if (contentType == null || !(this.encoder instanceof HttpMessageEncoder)) {
+	private boolean isStreamingMediaType(@Nullable MediaType mediaType) {
+		if (mediaType == null || !(this.encoder instanceof HttpMessageEncoder)) {
 			return false;
 		}
-		for (MediaType mediaType : ((HttpMessageEncoder<?>) this.encoder).getStreamingMediaTypes()) {
-			if (contentType.isCompatibleWith(mediaType) &&
-					contentType.getParameters().entrySet().containsAll(mediaType.getParameters().keySet())) {
+		for (MediaType streamingMediaType : ((HttpMessageEncoder<?>) this.encoder).getStreamingMediaTypes()) {
+			if (mediaType.isCompatibleWith(streamingMediaType) && matchParameters(mediaType, streamingMediaType)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private boolean matchParameters(MediaType streamingMediaType, MediaType mediaType) {
+		for (String name : streamingMediaType.getParameters().keySet()) {
+			String s1 = streamingMediaType.getParameter(name);
+			String s2 = mediaType.getParameter(name);
+			if (StringUtils.hasText(s1) && StringUtils.hasText(s2) && !s1.equalsIgnoreCase(s2)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2018 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.servlet.http.Cookie;
 
 import org.junit.Rule;
@@ -292,7 +293,9 @@ public class MockHttpServletRequestTests {
 		assertEquals("bar", cookies[0].getValue());
 		assertEquals("baz", cookies[1].getName());
 		assertEquals("qux", cookies[1].getValue());
-		assertEquals(Arrays.asList("foo=bar", "baz=qux"), cookieHeaders);
+
+		assertEquals(1, cookieHeaders.size());
+		assertEquals("foo=bar; baz=qux", cookieHeaders.get(0));
 	}
 
 	@Test
@@ -349,6 +352,13 @@ public class MockHttpServletRequestTests {
 		request.addHeader("Accept-Language", "en_US");
 		assertEquals(Locale.ENGLISH, request.getLocale());
 		assertEquals("en_US", request.getHeader("Accept-Language"));
+	}
+
+	@Test
+	public void emptyAcceptLanguageHeader() {
+		request.addHeader("Accept-Language", "");
+		assertEquals(Locale.ENGLISH, request.getLocale());
+		assertEquals("", request.getHeader("Accept-Language"));
 	}
 
 	@Test

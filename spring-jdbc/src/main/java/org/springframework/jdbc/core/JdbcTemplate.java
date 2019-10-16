@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.springframework.dao.DataAccessException;
@@ -576,7 +577,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 
 			private String appendSql(@Nullable String sql, String statement) {
-				return (StringUtils.isEmpty(sql) ? statement : sql + "; " + statement);
+				return (StringUtils.hasLength(sql) ? sql + "; " + statement : statement);
 			}
 
 			@Override

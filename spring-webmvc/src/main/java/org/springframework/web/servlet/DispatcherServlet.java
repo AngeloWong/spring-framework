@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -963,11 +964,12 @@ public class DispatcherServlet extends FrameworkServlet {
 				params = (request.getParameterMap().isEmpty() ? "" : "masked");
 			}
 
-			String query = StringUtils.isEmpty(request.getQueryString()) ? "" : "?" + request.getQueryString();
+			String queryString = request.getQueryString();
+			String queryClause = (StringUtils.hasLength(queryString) ? "?" + queryString : "");
 			String dispatchType = (!request.getDispatcherType().equals(DispatcherType.REQUEST) ?
 					"\"" + request.getDispatcherType().name() + "\" dispatch for " : "");
 			String message = (dispatchType + request.getMethod() + " \"" + getRequestUri(request) +
-					query + "\", parameters={" + params + "}");
+					queryClause + "\", parameters={" + params + "}");
 
 			if (traceOn) {
 				List<String> values = Collections.list(request.getHeaderNames());

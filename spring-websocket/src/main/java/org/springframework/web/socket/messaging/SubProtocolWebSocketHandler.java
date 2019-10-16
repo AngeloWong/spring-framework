@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2018 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -359,6 +359,9 @@ public class SubProtocolWebSocketHandler
 				if (logger.isDebugEnabled()) {
 					logger.debug("Terminating '" + session + "'", ex);
 				}
+				else if (logger.isWarnEnabled()) {
+					logger.warn("Terminating '" + session + "': " + ex.getMessage());
+				}
 				this.stats.incrementLimitExceededCount();
 				clearSession(session, ex.getStatus()); // clear first, session may be unresponsive
 				session.close(ex.getStatus());
@@ -420,7 +423,7 @@ public class SubProtocolWebSocketHandler
 		}
 
 		SubProtocolHandler handler;
-		if (!StringUtils.isEmpty(protocol)) {
+		if (StringUtils.hasLength(protocol)) {
 			handler = this.protocolHandlerLookup.get(protocol);
 			if (handler == null) {
 				throw new IllegalStateException(

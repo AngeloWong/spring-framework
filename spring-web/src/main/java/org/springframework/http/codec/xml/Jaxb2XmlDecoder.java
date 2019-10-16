@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2018 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -80,6 +81,15 @@ public class Jaxb2XmlDecoder extends AbstractDecoder<Object> {
 
 	public Jaxb2XmlDecoder() {
 		super(MimeTypeUtils.APPLICATION_XML, MimeTypeUtils.TEXT_XML);
+	}
+
+	/**
+	 * Create a {@code Jaxb2XmlDecoder} with the specified MIME types.
+	 * @param supportedMimeTypes supported MIME types
+	 * @since 5.1.9
+	 */
+	public Jaxb2XmlDecoder(MimeType... supportedMimeTypes) {
+		super(supportedMimeTypes);
 	}
 
 
